@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 use App\Repositories\ProductRepository;
 
+use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use DI\ContainerBuilder;
 use Slim\Handlers\Strategies\RequestResponseArgs;
+use App\Middleware\AddJsonResponseHeader;
 
 define ('APP_ROOT', dirname(__DIR__));
 
@@ -25,6 +27,11 @@ $collector = $app->getRouteCollector();
 
 $collector->setDefaultInvocationStrategy(new RequestResponseArgs());
 
+$error_middleware = $app->addErrorMiddleware(true, true, true);
+$error_handler = $error_middleware->getDefaultErrorHandler();
+$error_handler->forceContentType('application/json');
+$app->add(new AddJsonResponseHeader());
+
 $app->get('/api/v1/products', function (Request $request, Response $response) {
 
     //$dataBase = $this->get(App\Database::class);
@@ -33,7 +40,7 @@ $app->get('/api/v1/products', function (Request $request, Response $response) {
     $products = json_encode($repository->getAll());
 
     $response->getBody()->write($products);
-    return $response->withHeader('Content-type', 'application/json');
+    return $response;
 });
 
 $app->get('/api/v1/products/{id:[0-9]+}', function (Request $request, Response $response, string $id) {
@@ -42,10 +49,10 @@ $app->get('/api/v1/products/{id:[0-9]+}', function (Request $request, Response $
 
     $data = json_encode($repository->getById((int) $id));
     if(!$data){
-        throw new \Slim\Exception\HttpNotFoundException($request, message: 'No se encontro el producto solictado');
+        throw new HttpNotFoundException($request, message: 'No se encontro el producto solicitado');
     }
     $response->getBody()->write($data);
-    return $response->withHeader('Content-type', 'application/json');
+    return $response;
 });
 
 $app->get('/', function (Request $request, Response $response) {
