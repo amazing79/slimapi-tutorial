@@ -12,11 +12,11 @@ class ProductRepository
     private $db;
 
     /**
-     * @param $db
+     * @param Database $db
      */
-    public function __construct($db = null)
+    public function __construct(Database $db)
     {
-        $this->db = $db ?? new Database();
+        $this->db = $db;
     }
 
     public function getAll():array
