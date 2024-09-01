@@ -25,4 +25,16 @@ class ProductRepository
         $stmt = $pdo->query('Select * from products');
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getById(int $id): array|bool
+    {
+        $sql = 'SELECT * FROM products WHERE id = :id';
+        $pdo = $this->db->getConnection();
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+    }
 }
