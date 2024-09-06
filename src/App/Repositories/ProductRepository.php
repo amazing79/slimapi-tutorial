@@ -35,6 +35,23 @@ class ProductRepository
         $stmt->execute();
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function create(array $values): bool|string
+    {
+        $sql = 'INSERT INTO products (name, description, size)
+        VALUES (:name, :description, :size)';
+
+        $pdo = $this->db->getConnection();
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':name', $values['name'], PDO::PARAM_STR);
+        $stmt->bindValue(':description', $values['description'], PDO::PARAM_STR);
+        $stmt->bindValue(':size', $values['size'], PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $pdo->lastInsertId();
+
 
     }
 }
