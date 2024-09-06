@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Repositories\ProductRepository;
 
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -33,6 +32,12 @@ $app->add(new AddJsonResponseHeader());
 
 $app->get('/api/v1/products', \App\Controllers\ProductIndex::class);
 
+//$app->get('/api/v1/products/{id:[0-9]+}', [\App\Controllers\Products::class, 'show'])
+ //   ->add(\App\Middleware\GetProduct::class);
+$app->get('/api/v1/products/{id:[0-9]+}', \App\Controllers\Products::class . ':show')
+    ->add(\App\Middleware\GetProduct::class);
+/*
+ * codigo anterior, antes de llevar al controller
 $app->get('/api/v1/products/{id:[0-9]+}', function (Request $request, Response $response, string $id) {
     $product = $request->getAttribute('product');
     $body = json_encode($product);
@@ -40,10 +45,7 @@ $app->get('/api/v1/products/{id:[0-9]+}', function (Request $request, Response $
     return $response;
 
 })->add(\App\Middleware\GetProduct::class);
-
-$app->get('/', function (Request $request, Response $response) {
-    $response->getBody()->write('Main Page');
-    return $response;
-});
+*/
+$app->get('/', \App\Controllers\Index::class.':index');
 
 $app->run();
