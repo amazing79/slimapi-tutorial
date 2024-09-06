@@ -9,7 +9,7 @@ use PDO;
 
 class ProductRepository
 {
-    private $db;
+    private Database $db;
 
     /**
      * @param Database $db

@@ -12,6 +12,6 @@ class AddJsonResponseHeader
     {
         $response = $handler->handle($request);
 
-        return $response->withHeader('Content-Type', 'apllication/json');
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }

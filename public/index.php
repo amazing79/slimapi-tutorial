@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Repositories\ProductRepository;
 
-use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -32,28 +31,15 @@ $error_handler = $error_middleware->getDefaultErrorHandler();
 $error_handler->forceContentType('application/json');
 $app->add(new AddJsonResponseHeader());
 
-$app->get('/api/v1/products', function (Request $request, Response $response) {
-
-    //$dataBase = $this->get(App\Database::class);
-    //$repository = new ProductRepository($dataBase);
-    $repository = $this->get(ProductRepository::class);
-    $products = json_encode($repository->getAll());
-
-    $response->getBody()->write($products);
-    return $response;
-});
+$app->get('/api/v1/products', \App\Controllers\ProductIndex::class);
 
 $app->get('/api/v1/products/{id:[0-9]+}', function (Request $request, Response $response, string $id) {
-
-    $repository = $this->get(ProductRepository::class);
-
-    $data = json_encode($repository->getById((int) $id));
-    if(!$data){
-        throw new HttpNotFoundException($request, message: 'No se encontro el producto solicitado');
-    }
-    $response->getBody()->write($data);
+    $product = $request->getAttribute('product');
+    $body = json_encode($product);
+    $response->getBody()->write($body);
     return $response;
-});
+
+})->add(\App\Middleware\GetProduct::class);
 
 $app->get('/', function (Request $request, Response $response) {
     $response->getBody()->write('Main Page');
