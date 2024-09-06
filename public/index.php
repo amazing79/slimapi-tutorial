@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 
+use App\Controllers\ProductIndex;
+use App\Controllers\Products;
 use Slim\Factory\AppFactory;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
 use DI\ContainerBuilder;
 use Slim\Handlers\Strategies\RequestResponseArgs;
 use App\Middleware\AddJsonResponseHeader;
@@ -32,11 +32,16 @@ $error_handler = $error_middleware->getDefaultErrorHandler();
 $error_handler->forceContentType('application/json');
 $app->add(new AddJsonResponseHeader());
 
-$app->get('/api/v1/products', \App\Controllers\ProductIndex::class);
+$app->get('/api/v1/products', ProductIndex::class);
 
-$app->get('/api/v1/products/{id:[0-9]+}', \App\Controllers\Products::class . ':show')
+$app->get('/api/v1/products/{id:[0-9]+}', Products::class . ':show')
     ->add(\App\Middleware\GetProduct::class);
-$app->post('/api/v1/products', [\App\Controllers\Products::class,'create']);
+$app->post('/api/v1/products', [Products::class,'create']);
+$app->patch('/api/v1/products/{id:[0-9]+}', [Products::class,'update'])
+    ->add(\App\Middleware\GetProduct::class);
+
+$app->delete('/api/v1/products/{id:[0-9]+}', [Products::class,'delete'])
+    ->add(\App\Middleware\GetProduct::class);
 
 /*
  * codigo anterior, antes de llevar al controller

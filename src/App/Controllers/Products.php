@@ -5,12 +5,17 @@ namespace App\Controllers;
 use App\Repositories\ProductRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Valitron\Validator;
 
 class Products
 {
 
-    public function __construct(private ProductRepository $repository)
+    public function __construct(private ProductRepository $repository, private Validator $validator)
     {
+        $this->validator->mapFieldsRules([
+            'name' => ['required'],
+            'size' => ['required', 'integer', ['min', 1]]
+        ]);
     }
 
     public function show(Request $request, Response $response, string $id): Response
@@ -24,12 +29,54 @@ class Products
     public function create(Request $request, Response $response): Response
     {
        $body= $request->getParsedBody();
-       $id = $this->repository->create($body);
-       $body = json_encode([
-           'message' => 'El producto se ha registrado exitosamente',
-           'id' => $id
-       ]);
-       $response->getBody()->write($body);
-       return $response->withStatus(201);
+       $this->validator = $this->validator->withData($body);
+        if ( ! $this->validator->validate()) {
+            $response->getBody()
+                ->write(json_encode($this->validator->errors()));
+
+            return $response->withStatus(422);
+        }
+
+        $id = $this->repository->create($body);
+        $body = json_encode([
+            'message' => 'Product created',
+            'id' => $id
+        ]);
+
+        $response->getBody()->write($body);
+        return $response->withStatus(201);
+    }
+
+    public function update(Request $request, Response $response, string $id): Response
+    {
+        $body = $request->getParsedBody();
+        $this->validator = $this->validator->withData($body);
+        if ( ! $this->validator->validate()) {
+            $response->getBody()
+                ->write(json_encode($this->validator->errors()));
+            return $response->withStatus(422);
+
+        }
+
+        $rows = $this->repository->update((int) $id, $body);
+        $body = json_encode([
+            'message' => 'Producto actualizado correctamente',
+            'rows' => $rows
+        ]);
+
+        $response->getBody()->write($body);
+        return $response;
+    }
+
+    public function delete(Request $request, Response $response, string $id): Response
+    {
+        $rows = $this->repository->delete($id);
+        $body = json_encode([
+            'message' => 'Product dado de baja correctamente',
+            'rows' => $rows
+        ]);
+
+        $response->getBody()->write($body);
+        return $response;
     }
 }
