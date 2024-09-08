@@ -7,3 +7,9 @@ de la aplicacion mediante nuestras apis.
 
 [url al repo](https://github.com/daveh/slim-rest-api-example)
 
+Como parte final del tutorial, se agrego el ejemplo de usar archivos .env para poder almacenar la configuracion del 
+sistema, como conexion a la base, configuracion de email, etc. Para esto hacemos uso de una libreria que nos facilita
+la lectura de estos archivos. 
+
+[url al video](https://youtu.be/L5E2HSHrDjw?si=TcB2pzaeA1cvqoDb)
+

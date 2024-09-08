@@ -14,6 +14,11 @@ define ('APP_ROOT', dirname(__DIR__));
 
 require APP_ROOT . '/vendor/autoload.php';
 
+$dotenv = \Dotenv\Dotenv::createImmutable(dirname(APP_ROOT));
+// $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
+
+
 $builder = new ContainerBuilder;
 $container = $builder->addDefinitions(APP_ROOT . '/config/definitions.php')
             ->build();
