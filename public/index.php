@@ -35,6 +35,9 @@ $error_middleware = $app->addErrorMiddleware(true, true, true);
 $error_handler = $error_middleware->getDefaultErrorHandler();
 $error_handler->forceContentType('application/json');
 $app->add(new AddJsonResponseHeader());
+//comentar si se corre usando el server built-in de php
+$app->setBasePath($_ENV['APP_PATH']);
+
 
 $app->group('/api/v1', function (RouteCollectorProxy $group)
 {
